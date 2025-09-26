@@ -1,0 +1,51 @@
+variables:
+- group: "production"
+
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - api
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+- job: CI
+  steps:
+  - bash: |
+      cd api
+      if [ -f extensions.csproj ]
+      then
+          dotnet build extensions.csproj --output ./bin
+      fi
+      npm install
+      npm run build --if-present
+      npm prune --production
+  - task: ArchiveFiles@2
+    displayName: "Archive files"
+    inputs:
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/api"
+      includeRootFolder: false
+      archiveFile: "$(System.ArtifactStagingDirectory)/build$(Build.BuildId).zip"
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(System.ArtifactStagingDirectory)/build$(Build.BuildId).zip'
+      artifactName: 'api'
+
+- deployment: CD
+  dependsOn: CI
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  environment: 'Azure'
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - task: AzureFunctionApp@1
+          inputs:
+            azureSubscription: '$(azureSubscription)'
+            appType: functionApp
+            appName: $(functionAppName)
+            package: $(Pipeline.Workspace)/**/*.zip
