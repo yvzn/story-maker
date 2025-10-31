@@ -1,6 +1,9 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
-import { parse } from 'yaml';
+
+import { Language, parseLanguage } from "../shared/language.js";
+import { ChapterId } from "../shared/chapter.js";
+import { FeatureSet } from "../shared/feature.js";
 
 export async function features(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
 	context.log(`Http function processed request for url "${request.url}"`);
@@ -9,13 +12,13 @@ export async function features(request: HttpRequest, context: InvocationContext)
 	const language = parseLanguage(l);
 
 	const c = request.query.get('c');
-	const chapter = parseChapter(c);
+	const chapterId = parseChapterId(c);
 
-	if (!language || !chapter) {
+	if (!language || !chapterId) {
 		return { status: 400, body: "Bad Request" };
 	}
 
-	const featureSet = await readFeatureSet(language, chapter);
+	const featureSet = await readFeatureSet(language, chapterId);
 	if (!featureSet) {
 		return { status: 404, body: "Not Found" };
 	}
@@ -28,41 +31,21 @@ export async function features(request: HttpRequest, context: InvocationContext)
 
 app.http('features', {
 	methods: ['GET'],
-	authLevel: 'anonymous',
+	authLevel: 'function',
 	handler: features,
 });
 
 // ------------------------------------------------------------------
 
-type Language = 'en' | 'fr';
-
-function parseLanguage(l: string | null): Language | undefined {
-	if (!l) return undefined;
-	const lang = l.toLowerCase() as Language;
-	return lang === 'en' || lang === 'fr' ? lang : undefined;
-}
-
-function parseChapter(c: string | null): number | undefined {
+function parseChapterId(c: string | null): ChapterId | undefined {
 	if (!c) return undefined;
 	const chapter = parseInt(c, 10);
 	if (isNaN(chapter)) return undefined;
 	if (chapter < 1 || chapter > 6) return undefined;
-	return chapter;
+	return chapter as ChapterId;
 }
 
-interface FeatureSet {
-	options: FeatureSetOption[];
-}
-
-export interface FeatureSetOption {
-	id: number;
-	name: string;
-	description: string;
-	values_highlighted: string;
-	visual_prompts: string;
-}
-
-async function readFeatureSet(language: Language, chapter: number): Promise<FeatureSet | undefined> {
+async function readFeatureSet(language: Language, chapterId: ChapterId): Promise<FeatureSet | undefined> {
 	const connectionString = process.env.PROMPTS_STORAGE_CONNECTION_STRING;
 	if (!connectionString) {
 		throw new Error("PROMPTS_STORAGE_CONNECTION_STRING is not defined");
@@ -73,7 +56,7 @@ async function readFeatureSet(language: Language, chapter: number): Promise<Feat
 	const containerName = 'prompts';
 	const containerClient = blobServiceClient.getContainerClient(containerName);
 
-	const blobName = `c${chapter}.${language}.yaml`;
+	const blobName = `c${chapterId}.${language}.json`;
 	const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
 	if (!(await blockBlobClient.exists())) {
@@ -86,7 +69,7 @@ async function readFeatureSet(language: Language, chapter: number): Promise<Feat
 	}
 
 	const blobContent = await streamToText(downloadBlockBlobResponse.readableStreamBody!);
-	const featureSet = parse(blobContent) as FeatureSet;
+	const featureSet = JSON.parse(blobContent) as FeatureSet;
 
 	return featureSet;
 }
