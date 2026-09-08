@@ -2,13 +2,13 @@
 ###
 
 # @name chapters
-GET http://localhost:7071/api/chapters?s=1-2-3-4&l=fr&w=150
+GET http://localhost:7071/api/chapter-content?s=1-3&l=en&w=150
 
 ###
 
 
 # @name features
-GET http://localhost:7071/api/features?c=1&l=en
+GET http://localhost:7071/api/feature-options?c=2&l=en
 
 ###
 
