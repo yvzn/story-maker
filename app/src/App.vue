@@ -39,7 +39,7 @@ const chapterOptions = (chapter: number) => featureOptionsByChapter.value[chapte
 
 async function fetchFeatureOptionsForChapter(chapter: number) {
   const response = await fetch(
-    `https://example.com/api/feature-options?c=${chapter}&l=${selectedLanguage.value}`,
+    `http://localhost:7071/api/feature-options?c=${chapter}&l=${selectedLanguage.value}`,
   )
 
   if (!response.ok) {
