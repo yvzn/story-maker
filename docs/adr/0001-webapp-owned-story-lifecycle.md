@@ -1,8 +1,10 @@
 ---
-status: accepted
+status: superseded by ADR-0002
 ---
 
 # Keep the API stable and own story lifecycle in the webapp
+
+Superseded by [ADR-0002](./0002-api-owns-localized-child-facing-content.md) for the ownership of localized child-facing content; the webapp lifecycle decisions remain in force.
 
 The webapp will adapt to the existing API: it loads Feature Options by Chapter and sends the ordered hyphen-separated option IDs for generation. It will not duplicate option metadata or require new role-mapping endpoints. The webapp owns the user-facing lifecycle around that contract—Story Mode completeness, Guided Adventure progression, Story Draft and completion state, explicit navigation, backtracking invalidation, local Draft recovery, and local Favorites—because these are presentation and persistence concerns rather than generation concerns. This preserves a simple, already-working API while allowing the child-focused experience to enforce its own safety and accessibility behavior.
 

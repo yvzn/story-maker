@@ -24,6 +24,10 @@ _Avoid_: prompt, customization, free-text choice
 The ordered set of selected Feature Option IDs, one for each Chapter, that determines a Story; the API remains the source of their display metadata.
 _Avoid_: story prompt, preferences
 
+**Story Configuration Flow**:
+The child-facing sequence for choosing a Story's mode, Global Settings, and Feature Options before or during Chapter generation.
+_Avoid_: setup, wizard, form
+
 **Story Draft**:
 An in-progress Story whose Chapter selections or generated Chapters are not yet complete.
 _Avoid_: partial story, unfinished book
@@ -55,3 +59,11 @@ _Avoid_: admin settings, parental account
 **Favorite**:
 A locally saved Story Configuration and its Global Settings that the user marks for convenient return; reopening starts generation from Chapter 1 without saved text or reading position.
 _Avoid_: bookmark, saved prompt
+
+**Choice Card**:
+A large, equally weighted presentation of one Feature Option, including its child-facing name and short description.
+_Avoid_: option tile, selection panel
+
+**Reading View**:
+The focused experience for reading one Chapter, with the Chapter text primary and essential progress, listening, and continuation controls available.
+_Avoid_: story screen, content page
