@@ -24,12 +24,14 @@ interface Details {
 	name: string;
 	feature: string; // previously called "chapter"
 	description: Array<string>;
+	childSummary: Array<string>;
 }
 
 class Option {
 	id: OptionId = 0;
 	name: string = '';
 	description: Array<string> = [];
+	childSummary: Array<string> = [];
 	valuesHighlighted: string = '';
 	visualPrompts: string = '';
 }

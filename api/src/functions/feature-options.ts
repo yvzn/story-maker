@@ -47,6 +47,7 @@ function mapFeatureOptions(chapterTemplate: ChapterTemplate | undefined) {
 			id: option.id,
 			name: option.name,
 			description: option.description,
+			childSummary: option.childSummary,
 		})),
 	}
 }
